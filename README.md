@@ -24,10 +24,6 @@ Recursively clone the repo. Fetches the twentysixteen theme and WP core version 
 git clone --recursive https://github.com/Clark-Nikdel-Powell/WP-Multitenancy.git
 ```
 
-### Vagrant Up
+### Create Initial Site
 
-Start up the box.
-
-```
-vagrant up
-```
+`cd` into the folder and `sh flask create`. Create a first site like `mysite.dev`. The site will get wired up and the `vagrant up` command will run automatically.
