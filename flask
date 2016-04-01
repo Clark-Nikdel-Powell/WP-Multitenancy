@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+version_number=0.1
+
+root_folder="public"
+sites_folder="sites"
+wp_folder="wordpress"
+content_folder="content"
+
+sites_path="$root_folder/$sites_folder"
+wp_path="$root_folder/$wp_folder"
+
+version() {
+	echo "flask version $version_number"
+}
+
+create_site() {
+	vagrant halt
+	echo "Creating site..."
+	create_site_prompts
+	cd "$sites_path"
+	if [ ! -d "$site" ]; then
+		mkdir "$site"
+	fi
+	cd "$site"
+	ln -s ../../$content_folder content
+	ln -s ../../$wp_folder/stable wp
+	mkdir "media"
+	touch flask-hosts
+	printf "%s\n" "$site" >> flask-hosts
+	{
+		echo "<?php"
+		echo ""
+		echo "define('WP_USE_THEMES', true);"
+		echo "require( dirname( __FILE__ ) . '/wp/wp-blog-header.php' );"
+	} >> index.php
+	{
+		echo "<?php"
+		echo ""
+		echo "define('DB_NAME', '$site');"
+		echo "define('WP_DEBUG', false);"
+		echo ""
+		echo "if ( !defined('ABSPATH') )"
+		echo "define('ABSPATH', dirname(__FILE__) . '/wp/');"
+		echo ""
+		echo "require_once(ABSPATH . 'wp-settings.php');"
+	} >> wp-config.php
+	echo "Done..."
+	echo "Running up..."
+	vagrant up
+}
+
+create_site_prompts() {
+	while [ -z "$site" ]; do
+		read -p "Site: " site
+
+		if [ -z "$site" ]; then
+			echo "You must enter a site name"
+		fi
+	done
+}
+
+show_help() {
+	echo "HELP"
+}
+
+check_args() {
+	while [ ! -z "$1" ]; do
+		case "$1" in
+			--version)
+				version
+				shift
+				;;
+			-c|--create|create)
+				create_site
+				shift
+				;;
+			*)
+				echo "Unknown option $1"
+				shift
+				;;
+		esac
+	done
+
+	exit 0
+}
+
+main() {
+	if [ -z "$1" ]; then
+		show_help
+	fi
+
+	check_args "$@"
+}
+
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+	main "$@"
+fi

@@ -1,0 +1,6 @@
+[submodule "public/content/themes/twentysixteen"]
+	path = public/content/themes/twentysixteen
+	url = https://github.com/WordPress/twentysixteen.git
+[submodule "public/wordpress/4.4.2"]
+	path = public/wordpress/4.4.2
+	url = https://github.com/WordPress/WordPress.git
